@@ -1,10 +1,13 @@
+import * as PIXI from 'pixi.js';
+
 import {IGameObject} from "./IGameObject"
 import {Vector2,Dimensions2} from "../util/Math"
 
 
 export  class Player implements IGameObject {
 
-  color:string = "#FFF"
+  color:number = 0xFFF
+  graphics = new PIXI.Graphics(null);
 
   position:Vector2
   dimensions:Dimensions2 = new Dimensions2(Player.DEFAULT_WIDTH, Player.DEFAULT_HEIGHT)
@@ -14,17 +17,20 @@ export  class Player implements IGameObject {
   DefaultMovementSpeed:number = 7
 
 
-  constructor(position) {
+  constructor(app: PIXI.Application, position: Vector2) {
     this.position = position
+    app.stage.addChild(this.graphics);
   }
 
-  draw(context2D:CanvasRenderingContext2D) {
-    context2D.fillStyle = this.color
-    context2D.fillRect(this.position.x, this.position.y, this.dimensions.width, this.dimensions.height)
-    context2D.fillRect(this.position.x, this.position.y, this.dimensions.width, this.dimensions.height)
+  draw(app:PIXI.Application) {
+    this.graphics.clear();
+
+    this.graphics.beginFill(this.color); // Red
+    this.graphics.drawRect(this.position.x, this.position.y, this.dimensions.width, this.dimensions.height); // drawCircle(x, y, radius)
+    this.graphics.endFill();
   }
 
-  update(elapsedUnit) {
+  update(elapsedUnit:number) {
     this.position.x += this.movmentVector.x * elapsedUnit
     this.position.y += this.movmentVector.y * elapsedUnit
   }
@@ -55,7 +61,7 @@ export  class Player implements IGameObject {
 
   //todo
   explode() {
-    this.color = "#F00"
+    this.color = 0xF00
   }
 
 }

@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 import {Player} from "./gameObjects/Player"
 import {Vector2} from "./util/Math"
 import {GAME_DEFAULTS, KEYS} from "./Common"
@@ -10,11 +12,13 @@ export class Game {
   player: Player
   playerOffsetHeight: number = 20
 
+  app: PIXI.Application
+
   canvas: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById('canvas')
 
   context2D: CanvasRenderingContext2D
 
-  spaceColor: string = "black"
+  spaceColor: number = 0x26a7b5
 
   //for the key events
   rightDown: boolean = false
@@ -46,10 +50,14 @@ export class Game {
    * Basically we figure out the best width for our canvas at start up.
    */
   constructor() {
-    this.context2D = this.canvas.getContext("2d")
-    this.canvas.width = Game.MAX_CANVAS_WIDTH
-    this.canvas.height = this.canvas.width / Game.ASPECT_RATIO
-
+    this.app = new PIXI.Application({ 
+      width: Game.MAX_CANVAS_WIDTH,         // default: 800
+      height: Game.MAX_CANVAS_WIDTH / Game.ASPECT_RATIO,        // default: 600
+      antialias: true,    // default: false
+      transparent: false, // default: false
+      view: this.canvas,
+      resolution: 1       // default: 1
+    });
     this.initGame()
   }
 
@@ -69,20 +77,18 @@ export class Game {
   }
 
   initGame() {
-    //bottom middle
-    this.player = new Player(new Vector2(Game.MAX_CANVAS_WIDTH / 2,
+
+    this.player = new Player(this.app, new Vector2(Game.MAX_CANVAS_WIDTH / 2,
       this.canvas.height - this.playerOffsetHeight - Player.DEFAULT_HEIGHT))
   }
 
   drawBackground() {
-    var self = this
-    self.context2D.fillStyle = self.spaceColor
-    self.context2D.fillRect(0, 0, Game.MAX_CANVAS_WIDTH, this.canvas.height)
+    this.app.renderer.backgroundColor = this.spaceColor;
   }
 
   draw() {
     this.drawBackground()
-    this.player.draw(this.context2D)
+    this.player.draw(this.app);
   }
 
 
